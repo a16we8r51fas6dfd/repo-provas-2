@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import api, {
@@ -28,6 +28,7 @@ function Instructors() {
   >([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructorFilter, setInstructorFilter] = useState<string>("");
+  const [reload, setReload] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadPage() {
@@ -39,7 +40,7 @@ function Instructors() {
       setCategories(categoriesData.categories);
     }
     loadPage();
-  }, [token]);
+  }, [token, reload]);
 
   return (
     <>
@@ -80,6 +81,8 @@ function Instructors() {
           </Button>
         </Box>
         <TeachersDisciplinesAccordions
+          setReload={setReload}
+          reload={reload}
           token={token}
           categories={categories}
           teachersDisciplines={teachersDisciplines}
@@ -95,6 +98,8 @@ interface TeachersDisciplinesAccordionsProps {
   categories: Category[];
   instructorFilter: string;
   token: string | null;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 }
 
 function TeachersDisciplinesAccordions({
@@ -102,6 +107,8 @@ function TeachersDisciplinesAccordions({
   teachersDisciplines,
   instructorFilter,
   token,
+  reload,
+  setReload,
 }: TeachersDisciplinesAccordionsProps) {
   const teachers = getUniqueTeachers(teachersDisciplines);
 
@@ -118,6 +125,8 @@ function TeachersDisciplinesAccordions({
                 .filter(doesCategoryHaveTests(teacher, teachersDisciplines))
                 .map((category) => (
                   <Categories
+                    setReload={setReload}
+                    reload={reload}
                     token={token}
                     key={category.id}
                     category={category}
@@ -145,6 +154,8 @@ function TeachersDisciplinesAccordions({
                   .filter(doesCategoryHaveTests(teacher, teachersDisciplines))
                   .map((category) => (
                     <Categories
+                      setReload={setReload}
+                      reload={reload}
                       token={token}
                       key={category.id}
                       category={category}
@@ -196,6 +207,8 @@ interface CategoriesProps {
   category: Category;
   teacher: string;
   token: string | null;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 }
 
 function Categories({
@@ -203,6 +216,8 @@ function Categories({
   teachersDisciplines,
   teacher,
   token,
+  reload,
+  setReload,
 }: CategoriesProps) {
   return (
     <>
@@ -214,6 +229,8 @@ function Categories({
           )
           .map((teacherDiscipline) => (
             <Tests
+              setReload={setReload}
+              reload={reload}
               token={token}
               key={teacherDiscipline.id}
               tests={teacherDiscipline.tests.filter(
@@ -231,13 +248,27 @@ interface TestsProps {
   disciplineName: string;
   tests: Test[];
   token: string | null;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 }
 
-function Tests({ tests, disciplineName, token }: TestsProps) {
-  function handleTestClick(token: string | null, testId: number) {
+function Tests({
+  tests,
+  disciplineName,
+  token,
+  reload,
+  setReload,
+}: TestsProps) {
+  async function handleTestClick(token: string | null, testId: number) {
     if (!token) return;
 
-    api.updateViews(token, testId);
+    await api.updateViews(token, testId);
+
+    if (reload) {
+      setReload(false);
+    } else {
+      setReload(true);
+    }
   }
 
   return (

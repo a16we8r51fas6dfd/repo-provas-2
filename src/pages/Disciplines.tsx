@@ -1,3 +1,4 @@
+import { AirlineSeatReclineExtraOutlined } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
@@ -10,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Dispatch, SetStateAction } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import api, {
@@ -27,6 +28,7 @@ function Disciplines() {
   const [terms, setTerms] = useState<TestByDiscipline[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [disciplineFilter, setDisciplineFilter] = useState<string>("");
+  const [reload, setReload] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadPage() {
@@ -38,7 +40,7 @@ function Disciplines() {
       setCategories(categoriesData.categories);
     }
     loadPage();
-  }, [token]);
+  }, [token, reload]);
 
   return (
     <>
@@ -83,6 +85,8 @@ function Disciplines() {
           categories={categories}
           terms={terms}
           disciplineFilter={disciplineFilter}
+          reload={reload}
+          setReload={setReload}
         />
       </Box>
     </>
@@ -94,6 +98,8 @@ interface TermsAccordionsProps {
   terms: TestByDiscipline[];
   disciplineFilter: string;
   token: string | null;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 }
 
 function TermsAccordions({
@@ -101,6 +107,8 @@ function TermsAccordions({
   terms,
   disciplineFilter,
   token,
+  reload,
+  setReload,
 }: TermsAccordionsProps) {
   return (
     <Box sx={{ marginTop: "50px" }}>
@@ -115,6 +123,8 @@ function TermsAccordions({
               categories={categories}
               disciplines={term.disciplines}
               disciplineFilter={disciplineFilter}
+              reload={reload}
+              setReload={setReload}
             />
           </AccordionDetails>
         </Accordion>
@@ -128,6 +138,8 @@ interface DisciplinesAccordionsProps {
   disciplines: Discipline[];
   disciplineFilter: string;
   token: string | null;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 }
 
 function DisciplinesAccordions({
@@ -135,6 +147,8 @@ function DisciplinesAccordions({
   disciplines,
   disciplineFilter,
   token,
+  reload,
+  setReload,
 }: DisciplinesAccordionsProps) {
   if (disciplines.length === 0)
     return (
@@ -155,6 +169,8 @@ function DisciplinesAccordions({
             </AccordionSummary>
             <AccordionDetails>
               <Categories
+                setReload={setReload}
+                reload={reload}
                 token={token}
                 categories={categories}
                 teachersDisciplines={discipline.teacherDisciplines}
@@ -179,6 +195,8 @@ function DisciplinesAccordions({
               </AccordionSummary>
               <AccordionDetails>
                 <Categories
+                  setReload={setReload}
+                  reload={reload}
                   token={token}
                   categories={categories}
                   teachersDisciplines={discipline.teacherDisciplines}
@@ -195,12 +213,16 @@ interface CategoriesProps {
   categories: Category[];
   teachersDisciplines: TeacherDisciplines[];
   token: string | null;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 }
 
 function Categories({
   categories,
   teachersDisciplines,
   token,
+  reload,
+  setReload,
 }: CategoriesProps) {
   if (teachersDisciplines.length === 0)
     return <Typography>Nenhuma prova para essa disciplina...</Typography>;
@@ -213,6 +235,8 @@ function Categories({
           <Box key={category.id}>
             <Typography fontWeight="bold">{category.name}</Typography>
             <TeachersDisciplines
+              setReload={setReload}
+              reload={reload}
               token={token}
               categoryId={category.id}
               teachersDisciplines={teachersDisciplines}
@@ -227,6 +251,8 @@ interface TeacherDisciplineProps {
   teachersDisciplines: TeacherDisciplines[];
   categoryId: number;
   token: string | null;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 }
 
 function doesCategoryHaveTests(teachersDisciplines: TeacherDisciplines[]) {
@@ -248,6 +274,8 @@ function TeachersDisciplines({
   categoryId,
   teachersDisciplines,
   token,
+  reload,
+  setReload,
 }: TeacherDisciplineProps) {
   const testsWithDisciplines = teachersDisciplines.map((teacherDiscipline) => ({
     tests: teacherDiscipline.tests,
@@ -259,6 +287,8 @@ function TeachersDisciplines({
       categoryId={categoryId}
       testsWithTeachers={testsWithDisciplines}
       token={token}
+      reload={reload}
+      setReload={setReload}
     />
   );
 }
@@ -267,17 +297,27 @@ interface TestsProps {
   testsWithTeachers: { tests: Test[]; teacherName: string }[];
   categoryId: number;
   token: string | null;
+  reload: boolean;
+  setReload: Dispatch<SetStateAction<boolean>>;
 }
 
 function Tests({
   categoryId,
   testsWithTeachers: testsWithDisciplines,
   token,
+  reload,
+  setReload,
 }: TestsProps) {
-  function handleTestClick(token: string | null, testId: number) {
+  async function handleTestClick(token: string | null, testId: number) {
     if (!token) return;
 
-    api.updateViews(token, testId);
+    await api.updateViews(token, testId);
+
+    if (reload) {
+      setReload(false);
+    } else {
+      setReload(true);
+    }
   }
 
   return (
