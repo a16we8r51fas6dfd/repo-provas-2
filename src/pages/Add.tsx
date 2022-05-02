@@ -1,3 +1,4 @@
+import { ResetTvTwoTone } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
@@ -82,9 +83,17 @@ function Add() {
     setFormData({ ...formData, pdfUrl: e.target.value as string });
   };
 
-  function handleSubmit(e: React.FormEvent<HTMLInputElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
-    console.log(formData);
+    if (!token) return;
+    await api.insertNewTest(token, formData);
+    setFormData({
+      name: "",
+      pdfUrl: "",
+      category: "",
+      discipline: "",
+      teacher: "",
+    });
   }
   return (
     <>

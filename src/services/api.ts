@@ -67,6 +67,14 @@ export interface Test {
   category: Category;
 }
 
+export interface NewTest {
+  name: string;
+  pdfUrl: string;
+  category: string;
+  discipline: string;
+  teacher: string;
+}
+
 export type TestByDiscipline = Term & {
   disciplines: Discipline[];
 };
@@ -111,6 +119,11 @@ async function getTeacherByDiscipline(token: string, discipline: string) {
   );
 }
 
+async function insertNewTest(token: string, newTest: NewTest) {
+  const config = getConfig(token);
+  return baseAPI.post("/tests", newTest, config);
+}
+
 const api = {
   signUp,
   signIn,
@@ -119,6 +132,7 @@ const api = {
   getCategories,
   getDisciplines,
   getTeacherByDiscipline,
+  insertNewTest,
 };
 
 export default api;
