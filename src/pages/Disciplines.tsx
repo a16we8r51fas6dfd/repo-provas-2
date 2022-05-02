@@ -79,6 +79,7 @@ function Disciplines() {
           </Button>
         </Box>
         <TermsAccordions
+          token={token}
           categories={categories}
           terms={terms}
           disciplineFilter={disciplineFilter}
@@ -92,12 +93,14 @@ interface TermsAccordionsProps {
   categories: Category[];
   terms: TestByDiscipline[];
   disciplineFilter: string;
+  token: string | null;
 }
 
 function TermsAccordions({
   categories,
   terms,
   disciplineFilter,
+  token,
 }: TermsAccordionsProps) {
   return (
     <Box sx={{ marginTop: "50px" }}>
@@ -108,6 +111,7 @@ function TermsAccordions({
           </AccordionSummary>
           <AccordionDetails>
             <DisciplinesAccordions
+              token={token}
               categories={categories}
               disciplines={term.disciplines}
               disciplineFilter={disciplineFilter}
@@ -123,12 +127,14 @@ interface DisciplinesAccordionsProps {
   categories: Category[];
   disciplines: Discipline[];
   disciplineFilter: string;
+  token: string | null;
 }
 
 function DisciplinesAccordions({
   categories,
   disciplines,
   disciplineFilter,
+  token,
 }: DisciplinesAccordionsProps) {
   if (disciplines.length === 0)
     return (
@@ -149,6 +155,7 @@ function DisciplinesAccordions({
             </AccordionSummary>
             <AccordionDetails>
               <Categories
+                token={token}
                 categories={categories}
                 teachersDisciplines={discipline.teacherDisciplines}
               />
@@ -172,6 +179,7 @@ function DisciplinesAccordions({
               </AccordionSummary>
               <AccordionDetails>
                 <Categories
+                  token={token}
                   categories={categories}
                   teachersDisciplines={discipline.teacherDisciplines}
                 />
@@ -186,9 +194,14 @@ function DisciplinesAccordions({
 interface CategoriesProps {
   categories: Category[];
   teachersDisciplines: TeacherDisciplines[];
+  token: string | null;
 }
 
-function Categories({ categories, teachersDisciplines }: CategoriesProps) {
+function Categories({
+  categories,
+  teachersDisciplines,
+  token,
+}: CategoriesProps) {
   if (teachersDisciplines.length === 0)
     return <Typography>Nenhuma prova para essa disciplina...</Typography>;
 
@@ -200,6 +213,7 @@ function Categories({ categories, teachersDisciplines }: CategoriesProps) {
           <Box key={category.id}>
             <Typography fontWeight="bold">{category.name}</Typography>
             <TeachersDisciplines
+              token={token}
               categoryId={category.id}
               teachersDisciplines={teachersDisciplines}
             />
@@ -212,6 +226,7 @@ function Categories({ categories, teachersDisciplines }: CategoriesProps) {
 interface TeacherDisciplineProps {
   teachersDisciplines: TeacherDisciplines[];
   categoryId: number;
+  token: string | null;
 }
 
 function doesCategoryHaveTests(teachersDisciplines: TeacherDisciplines[]) {
@@ -232,6 +247,7 @@ function testOfCategory(test: Test, categoryId: number) {
 function TeachersDisciplines({
   categoryId,
   teachersDisciplines,
+  token,
 }: TeacherDisciplineProps) {
   const testsWithDisciplines = teachersDisciplines.map((teacherDiscipline) => ({
     tests: teacherDiscipline.tests,
@@ -239,19 +255,31 @@ function TeachersDisciplines({
   }));
 
   return (
-    <Tests categoryId={categoryId} testsWithTeachers={testsWithDisciplines} />
+    <Tests
+      categoryId={categoryId}
+      testsWithTeachers={testsWithDisciplines}
+      token={token}
+    />
   );
 }
 
 interface TestsProps {
   testsWithTeachers: { tests: Test[]; teacherName: string }[];
   categoryId: number;
+  token: string | null;
 }
 
 function Tests({
   categoryId,
   testsWithTeachers: testsWithDisciplines,
+  token,
 }: TestsProps) {
+  function handleTestClick(token: string | null, testId: number) {
+    if (!token) return;
+
+    api.updateViews(token, testId);
+  }
+
   return (
     <>
       {testsWithDisciplines.map((testsWithDisciplines) =>
@@ -264,7 +292,8 @@ function Tests({
                 target="_blank"
                 underline="none"
                 color="inherit"
-              >{`${test.name} (${testsWithDisciplines.teacherName})`}</Link>
+                onClick={() => handleTestClick(token, test.id)}
+              >{`${test.name} (${testsWithDisciplines.teacherName}) (views: ${test.views})`}</Link>
             </Typography>
           ))
       )}

@@ -65,6 +65,7 @@ export interface Test {
   name: string;
   pdfUrl: string;
   category: Category;
+  views: number;
 }
 
 export interface NewTest {
@@ -124,6 +125,14 @@ async function insertNewTest(token: string, newTest: NewTest) {
   return baseAPI.post("/tests", newTest, config);
 }
 
+async function updateViews(token: string, testId: number) {
+  const identifier = {
+    id: testId,
+  };
+  const config = getConfig(token);
+  return baseAPI.patch("/tests", identifier, config);
+}
+
 const api = {
   signUp,
   signIn,
@@ -133,6 +142,7 @@ const api = {
   getDisciplines,
   getTeacherByDiscipline,
   insertNewTest,
+  updateViews,
 };
 
 export default api;

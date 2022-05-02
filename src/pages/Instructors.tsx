@@ -80,6 +80,7 @@ function Instructors() {
           </Button>
         </Box>
         <TeachersDisciplinesAccordions
+          token={token}
           categories={categories}
           teachersDisciplines={teachersDisciplines}
           instructorFilter={instructorFilter}
@@ -93,12 +94,14 @@ interface TeachersDisciplinesAccordionsProps {
   teachersDisciplines: TestByTeacher[];
   categories: Category[];
   instructorFilter: string;
+  token: string | null;
 }
 
 function TeachersDisciplinesAccordions({
   categories,
   teachersDisciplines,
   instructorFilter,
+  token,
 }: TeachersDisciplinesAccordionsProps) {
   const teachers = getUniqueTeachers(teachersDisciplines);
 
@@ -115,6 +118,7 @@ function TeachersDisciplinesAccordions({
                 .filter(doesCategoryHaveTests(teacher, teachersDisciplines))
                 .map((category) => (
                   <Categories
+                    token={token}
                     key={category.id}
                     category={category}
                     teacher={teacher}
@@ -141,6 +145,7 @@ function TeachersDisciplinesAccordions({
                   .filter(doesCategoryHaveTests(teacher, teachersDisciplines))
                   .map((category) => (
                     <Categories
+                      token={token}
                       key={category.id}
                       category={category}
                       teacher={teacher}
@@ -190,12 +195,14 @@ interface CategoriesProps {
   teachersDisciplines: TeacherDisciplines[];
   category: Category;
   teacher: string;
+  token: string | null;
 }
 
 function Categories({
   category,
   teachersDisciplines,
   teacher,
+  token,
 }: CategoriesProps) {
   return (
     <>
@@ -207,6 +214,7 @@ function Categories({
           )
           .map((teacherDiscipline) => (
             <Tests
+              token={token}
               key={teacherDiscipline.id}
               tests={teacherDiscipline.tests.filter(
                 (test) => test.category.id === category.id
@@ -222,9 +230,16 @@ function Categories({
 interface TestsProps {
   disciplineName: string;
   tests: Test[];
+  token: string | null;
 }
 
-function Tests({ tests, disciplineName }: TestsProps) {
+function Tests({ tests, disciplineName, token }: TestsProps) {
+  function handleTestClick(token: string | null, testId: number) {
+    if (!token) return;
+
+    api.updateViews(token, testId);
+  }
+
   return (
     <>
       {tests.map((test) => (
@@ -234,7 +249,8 @@ function Tests({ tests, disciplineName }: TestsProps) {
             target="_blank"
             underline="none"
             color="inherit"
-          >{`${test.name} (${disciplineName})`}</Link>
+            onClick={() => handleTestClick(token, test.id)}
+          >{`${test.name} (${disciplineName}) (views:${test.views})`}</Link>
         </Typography>
       ))}
     </>

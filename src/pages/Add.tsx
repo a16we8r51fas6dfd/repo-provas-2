@@ -1,4 +1,3 @@
-import { ResetTvTwoTone } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
@@ -7,10 +6,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import api, { Category } from "../services/api";
+import api from "../services/api";
 
 function Add() {
   const navigate = useNavigate();
@@ -73,7 +72,7 @@ function Add() {
       );
     }
     loadInstructors();
-  }, [formData.discipline]);
+  }, [token, formData.discipline]);
 
   const handleChangeTitle = (e: React.ChangeEvent<any>): void => {
     setFormData({ ...formData, name: e.target.value as string });
