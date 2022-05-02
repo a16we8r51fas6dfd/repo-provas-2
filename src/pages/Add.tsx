@@ -85,6 +85,10 @@ function Add() {
   async function handleSubmit(e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
     if (!token) return;
+
+    const valid = /^(ftp|http|https):\/\/[^ "]+$/.test(formData.pdfUrl);
+    if (!valid) alert("PDF da prova deve ser uma URL válida");
+
     await api.insertNewTest(token, formData);
     setFormData({
       name: "",
