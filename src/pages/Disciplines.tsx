@@ -26,6 +26,7 @@ function Disciplines() {
   const { token } = useAuth();
   const [terms, setTerms] = useState<TestByDiscipline[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [disciplineFilter, setDisciplineFilter] = useState<string>("");
 
   useEffect(() => {
     async function loadPage() {
@@ -44,6 +45,8 @@ function Disciplines() {
       <TextField
         sx={{ marginX: "auto", marginBottom: "25px", width: "450px" }}
         label="Pesquise por disciplina"
+        onChange={(event) => setDisciplineFilter(event.target.value)}
+        onClick={() => console.log(disciplineFilter, categories, terms)}
       />
       <Divider sx={{ marginBottom: "35px" }} />
       <Box
@@ -76,7 +79,11 @@ function Disciplines() {
             Adicionar
           </Button>
         </Box>
-        <TermsAccordions categories={categories} terms={terms} />
+        <TermsAccordions
+          categories={categories}
+          terms={terms}
+          disciplineFilter={disciplineFilter}
+        />
       </Box>
     </>
   );
@@ -85,9 +92,14 @@ function Disciplines() {
 interface TermsAccordionsProps {
   categories: Category[];
   terms: TestByDiscipline[];
+  disciplineFilter: string;
 }
 
-function TermsAccordions({ categories, terms }: TermsAccordionsProps) {
+function TermsAccordions({
+  categories,
+  terms,
+  disciplineFilter,
+}: TermsAccordionsProps) {
   return (
     <Box sx={{ marginTop: "50px" }}>
       {terms.map((term) => (
@@ -99,6 +111,7 @@ function TermsAccordions({ categories, terms }: TermsAccordionsProps) {
             <DisciplinesAccordions
               categories={categories}
               disciplines={term.disciplines}
+              disciplineFilter={disciplineFilter}
             />
           </AccordionDetails>
         </Accordion>
@@ -110,35 +123,65 @@ function TermsAccordions({ categories, terms }: TermsAccordionsProps) {
 interface DisciplinesAccordionsProps {
   categories: Category[];
   disciplines: Discipline[];
+  disciplineFilter: string;
 }
 
 function DisciplinesAccordions({
   categories,
   disciplines,
+  disciplineFilter,
 }: DisciplinesAccordionsProps) {
-  if (disciplines.length === 0)
-    return <Typography>Nenhuma prova para esse período...</Typography>;
-
-  return (
-    <>
-      {disciplines.map((discipline) => (
-        <Accordion
-          sx={{ backgroundColor: "#FFF", boxShadow: "none" }}
-          key={discipline.id}
-        >
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">{discipline.name}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Categories
-              categories={categories}
-              teachersDisciplines={discipline.teacherDisciplines}
-            />
-          </AccordionDetails>
-        </Accordion>
-      ))}
-    </>
-  );
+  /* if (disciplines.length === 0)
+    return (
+      <React.Fragment>
+        <Typography>Nenhuma prova para esse período...</Typography>{" "}
+      </React.Fragment>
+    ); */
+  if (disciplineFilter === "") {
+    return (
+      <>
+        {disciplines.map((discipline) => (
+          <Accordion
+            sx={{ backgroundColor: "#FFF", boxShadow: "none" }}
+            key={discipline.id}
+          >
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography fontWeight="bold">{discipline.name}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Categories
+                categories={categories}
+                teachersDisciplines={discipline.teacherDisciplines}
+              />
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </>
+    );
+  } else {
+    return (
+      <>
+        {disciplines
+          .filter((discipline) => discipline.name.includes(disciplineFilter))
+          .map((discipline) => (
+            <Accordion
+              sx={{ backgroundColor: "#FFF", boxShadow: "none" }}
+              key={discipline.id}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography fontWeight="bold">{discipline.name}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Categories
+                  categories={categories}
+                  teachersDisciplines={discipline.teacherDisciplines}
+                />
+              </AccordionDetails>
+            </Accordion>
+          ))}
+      </>
+    );
+  }
 }
 
 interface CategoriesProps {
