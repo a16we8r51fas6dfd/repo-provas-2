@@ -17,6 +17,7 @@ function Add() {
 
   const [selectDiscipline, setSelectDiscipline] = React.useState<any>([]);
   const [selectCategory, setSelectCategory] = React.useState<any>([]);
+  const [selectInstructors, setSelectInstructors] = React.useState<any>([]);
 
   interface Test {
     name: string;
@@ -51,6 +52,40 @@ function Add() {
     loadPage();
   }, [token]);
 
+  useEffect(() => {
+    async function loadInstructors() {
+      if (!token) return;
+
+      if (!formData.discipline) return;
+
+      const { data: instructorsData } = await api.getTeacherByDiscipline(
+        token,
+        formData.discipline
+      );
+
+      const instructorsFiltered = instructorsData.teachers.filter(
+        (object: any) => object.discipline.name === formData.discipline
+      );
+
+      setSelectInstructors(
+        instructorsFiltered.map((object: any) => object.teacher.name)
+      );
+    }
+    loadInstructors();
+  }, [formData.discipline]);
+
+  const handleChangeTitle = (e: React.ChangeEvent<any>): void => {
+    setFormData({ ...formData, name: e.target.value as string });
+  };
+
+  const handleChangeUrl = (e: React.ChangeEvent<any>): void => {
+    setFormData({ ...formData, pdfUrl: e.target.value as string });
+  };
+
+  function handleSubmit(e: React.FormEvent<HTMLInputElement>) {
+    e.preventDefault();
+    console.log(formData);
+  }
   return (
     <>
       <Typography
@@ -100,8 +135,8 @@ function Add() {
           </Button>
         </Box>
         <Box
-          //component={"form"}
-          //onSubmit={}
+          component="form"
+          onSubmit={handleSubmit}
           sx={{
             marginTop: "50px",
             marginBottom: "50px",
@@ -110,8 +145,16 @@ function Add() {
             gap: "28px",
           }}
         >
-          <TextField label="Título da prova" variant="outlined" />
-          <TextField label="PDF da prova" variant="outlined" />
+          <TextField
+            label="Título da prova"
+            variant="outlined"
+            onChange={handleChangeTitle}
+          />
+          <TextField
+            label="PDF da prova"
+            variant="outlined"
+            onChange={handleChangeUrl}
+          />
           <Autocomplete
             options={selectCategory}
             renderInput={(params) => (
@@ -131,12 +174,15 @@ function Add() {
             }}
           />
           <Autocomplete
+            key={formData.discipline}
             disabled={formData.discipline === "" || !formData.discipline}
-            options={["teste1", "teste2"]}
+            options={selectInstructors}
             renderInput={(params) => (
               <TextField {...params} label="Pessoa Instrutora" />
             )}
-            onClick={() => console.log(formData.discipline)}
+            onChange={(event: any, value: string | null) => {
+              setFormData({ ...formData, teacher: value as string });
+            }}
           />
           <Button type="submit" variant="contained">
             enviar

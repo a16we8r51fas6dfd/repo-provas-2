@@ -49,6 +49,12 @@ export interface Teacher {
   name: string;
 }
 
+export interface FilterTeachers {
+  id: number;
+  discipline: Discipline[];
+  teacher: Teacher;
+}
+
 export interface Category {
   id: number;
   name: string;
@@ -97,6 +103,14 @@ async function getDisciplines(token: string) {
   return baseAPI.get<{ disciplines: Discipline[] }>("/disciplines", config);
 }
 
+async function getTeacherByDiscipline(token: string, discipline: string) {
+  const config = getConfig(token);
+  return baseAPI.get<{ teachers: FilterTeachers[] }>(
+    `/teachers/${discipline}`,
+    config
+  );
+}
+
 const api = {
   signUp,
   signIn,
@@ -104,6 +118,7 @@ const api = {
   getTestsByTeacher,
   getCategories,
   getDisciplines,
+  getTeacherByDiscipline,
 };
 
 export default api;
