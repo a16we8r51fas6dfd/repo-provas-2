@@ -27,6 +27,7 @@ function Instructors() {
     TestByTeacher[]
   >([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [instructorFilter, setInstructorFilter] = useState<string>("");
 
   useEffect(() => {
     async function loadPage() {
@@ -45,6 +46,7 @@ function Instructors() {
       <TextField
         sx={{ marginX: "auto", marginBottom: "25px", width: "450px" }}
         label="Pesquise por pessoa instrutora"
+        onChange={(event) => setInstructorFilter(event.target.value)}
       />
       <Divider sx={{ marginBottom: "35px" }} />
       <Box
@@ -80,6 +82,7 @@ function Instructors() {
         <TeachersDisciplinesAccordions
           categories={categories}
           teachersDisciplines={teachersDisciplines}
+          instructorFilter={instructorFilter}
         />
       </Box>
     </>
@@ -89,37 +92,67 @@ function Instructors() {
 interface TeachersDisciplinesAccordionsProps {
   teachersDisciplines: TestByTeacher[];
   categories: Category[];
+  instructorFilter: string;
 }
 
 function TeachersDisciplinesAccordions({
   categories,
   teachersDisciplines,
+  instructorFilter,
 }: TeachersDisciplinesAccordionsProps) {
   const teachers = getUniqueTeachers(teachersDisciplines);
 
-  return (
-    <Box sx={{ marginTop: "50px" }}>
-      {teachers.map((teacher) => (
-        <Accordion sx={{ backgroundColor: "#FFF" }} key={teacher}>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography fontWeight="bold">{teacher}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            {categories
-              .filter(doesCategoryHaveTests(teacher, teachersDisciplines))
-              .map((category) => (
-                <Categories
-                  key={category.id}
-                  category={category}
-                  teacher={teacher}
-                  teachersDisciplines={teachersDisciplines}
-                />
-              ))}
-          </AccordionDetails>
-        </Accordion>
-      ))}
-    </Box>
-  );
+  if (instructorFilter === "") {
+    return (
+      <Box sx={{ marginTop: "50px" }}>
+        {teachers.map((teacher) => (
+          <Accordion sx={{ backgroundColor: "#FFF" }} key={teacher}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography fontWeight="bold">{teacher}</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              {categories
+                .filter(doesCategoryHaveTests(teacher, teachersDisciplines))
+                .map((category) => (
+                  <Categories
+                    key={category.id}
+                    category={category}
+                    teacher={teacher}
+                    teachersDisciplines={teachersDisciplines}
+                  />
+                ))}
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Box>
+    );
+  } else {
+    return (
+      <Box sx={{ marginTop: "50px" }}>
+        {teachers
+          .filter((teacher) => teacher.includes(instructorFilter))
+          .map((teacher) => (
+            <Accordion sx={{ backgroundColor: "#FFF" }} key={teacher}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography fontWeight="bold">{teacher}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {categories
+                  .filter(doesCategoryHaveTests(teacher, teachersDisciplines))
+                  .map((category) => (
+                    <Categories
+                      key={category.id}
+                      category={category}
+                      teacher={teacher}
+                      teachersDisciplines={teachersDisciplines}
+                    />
+                  ))}
+              </AccordionDetails>
+            </Accordion>
+          ))}
+      </Box>
+    );
+  }
 }
 
 function getUniqueTeachers(teachersDisciplines: TestByTeacher[]) {

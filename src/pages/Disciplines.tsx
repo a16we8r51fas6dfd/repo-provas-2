@@ -46,7 +46,6 @@ function Disciplines() {
         sx={{ marginX: "auto", marginBottom: "25px", width: "450px" }}
         label="Pesquise por disciplina"
         onChange={(event) => setDisciplineFilter(event.target.value)}
-        onClick={() => console.log(disciplineFilter, categories, terms)}
       />
       <Divider sx={{ marginBottom: "35px" }} />
       <Box
@@ -131,12 +130,12 @@ function DisciplinesAccordions({
   disciplines,
   disciplineFilter,
 }: DisciplinesAccordionsProps) {
-  /* if (disciplines.length === 0)
+  if (disciplines.length === 0)
     return (
       <React.Fragment>
         <Typography>Nenhuma prova para esse período...</Typography>{" "}
       </React.Fragment>
-    ); */
+    );
   if (disciplineFilter === "") {
     return (
       <>
