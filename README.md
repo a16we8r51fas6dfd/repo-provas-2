@@ -40,7 +40,7 @@ Antes de começar você deve ter instalado:
 
 ``` jsx
 // clone este repositório
-$ git git@github.com:fernando-yaeda/repo-provas-api-2.git
+$ git git@github.com:fernando-yaeda/repo-provas-2.git
 // acesse o diretório
 $ cd repo-provas-2
 // instale as dependências
