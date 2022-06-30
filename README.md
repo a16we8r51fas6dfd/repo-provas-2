@@ -58,7 +58,7 @@ Foram usadas nesse projeto as seguintes tecnologias:
 
 -   **[Axios](https://github.com/axios/axios)**
 -   **[React-router-dom](https://github.com/remix-run/react-router)**
--   **[Material-UI](https://github.com/mui/material-ui)
+-   **[Material-UI](https://github.com/mui/material-ui)**
 -   **[Styled-components](https://github.com/styled-components/styled-components)**
 -   **[Prettier](https://github.com/prettier/prettier)**
 
