@@ -35,6 +35,7 @@ function Add() {
     teacher: "",
   });
 
+
   useEffect(() => {
     async function loadPage() {
       if (!token) return;
@@ -50,7 +51,7 @@ function Add() {
       );
     }
     loadPage();
-  }, [token]);
+  }, [token, formData]);
 
   useEffect(() => {
     async function loadInstructors() {
@@ -161,11 +162,13 @@ function Add() {
             label="Título da prova"
             variant="outlined"
             onChange={handleChangeTitle}
+            value={formData.name}
           />
           <TextField
             label="PDF da prova"
             variant="outlined"
             onChange={handleChangeUrl}
+            value={formData.pdfUrl}
           />
           <Autocomplete
             options={selectCategory}
@@ -175,6 +178,7 @@ function Add() {
             onChange={(event: any, value: string | null) => {
               setFormData({ ...formData, category: value as string });
             }}
+            value={formData.category}
           />
           <Autocomplete
             options={selectDiscipline}
@@ -184,6 +188,7 @@ function Add() {
             onChange={(event: any, value: string | null) => {
               setFormData({ ...formData, discipline: value as string });
             }}
+            value={formData.discipline}
           />
           <Autocomplete
             key={formData.discipline}
@@ -195,6 +200,7 @@ function Add() {
             onChange={(event: any, value: string | null) => {
               setFormData({ ...formData, teacher: value as string });
             }}
+            value={formData.teacher}
           />
           <Button type="submit" variant="contained">
             enviar
