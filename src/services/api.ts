@@ -128,7 +128,7 @@ async function updateViews(token: string, testId: number) {
     id: testId,
   };
   const config = getConfig(token);
-  return axios.patch(`${baseURL}/tests, identifier, config);
+  return axios.patch(`${baseURL}/tests`, identifier, config);
 }
 
 const api = {
