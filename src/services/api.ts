@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = process.env.DATABASE_URL;
+const baseURL = process.env.REACT_APP_BASE_URL;
 
 interface UserData {
   email: string;
