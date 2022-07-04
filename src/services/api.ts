@@ -1,8 +1,6 @@
 import axios from "axios";
 
-const baseAPI = axios.create({
-  baseURL: "process.env.DATABASE_URL",
-});
+const baseURL: "process.env.DATABASE_URL";
 
 interface UserData {
   email: string;
@@ -22,7 +20,7 @@ async function signUp(signUpData: UserData) {
 }
 
 async function signIn(signInData: UserData) {
-  return axios.post<{ token: string }>(``${baseURL}/sign-in`, signInData);
+  return axios.post<{ token: string }>(`${baseURL}/sign-in`, signInData);
 }
 
 export interface Term {
