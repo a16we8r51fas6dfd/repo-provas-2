@@ -18,11 +18,11 @@ function getConfig(token: string) {
 }
 
 async function signUp(signUpData: UserData) {
-  await baseAPI.post("/sign-up", signUpData);
+  await axios.post(`${baseURL}/sign-up`, signUpData);
 }
 
 async function signIn(signInData: UserData) {
-  return baseAPI.post<{ token: string }>("/sign-in", signInData);
+  return axios.post<{ token: string }>(``${baseURL}/sign-in`, signInData);
 }
 
 export interface Term {
@@ -88,41 +88,41 @@ export type TestByTeacher = TeacherDisciplines & {
 
 async function getTestsByDiscipline(token: string) {
   const config = getConfig(token);
-  return baseAPI.get<{ tests: TestByDiscipline[] }>(
-    "/tests?groupBy=disciplines",
+  return axios.get<{ tests: TestByDiscipline[] }>(
+    `${baseURL}/tests?groupBy=disciplines`,
     config
   );
 }
 
 async function getTestsByTeacher(token: string) {
   const config = getConfig(token);
-  return baseAPI.get<{ tests: TestByTeacher[] }>(
-    "/tests?groupBy=teachers",
+  return axios.get<{ tests: TestByTeacher[] }>(
+    `${baseURL}/tests?groupBy=teachers`,
     config
   );
 }
 
 async function getCategories(token: string) {
   const config = getConfig(token);
-  return baseAPI.get<{ categories: Category[] }>("/categories", config);
+  return axios.get<{ categories: Category[] }>(`${baseURL}/categories`, config);
 }
 
 async function getDisciplines(token: string) {
   const config = getConfig(token);
-  return baseAPI.get<{ disciplines: Discipline[] }>("/disciplines", config);
+  return axios.get<{ disciplines: Discipline[] }>(`${baseURL}/disciplines`, config);
 }
 
 async function getTeacherByDiscipline(token: string, discipline: string) {
   const config = getConfig(token);
-  return baseAPI.get<{ teachers: FilterTeachers[] }>(
-    `/teachers/${discipline}`,
+  return axios.get<{ teachers: FilterTeachers[] }>(
+    `${baseURL}/teachers/${discipline}`,
     config
   );
 }
 
 async function insertNewTest(token: string, newTest: NewTest) {
   const config = getConfig(token);
-  return baseAPI.post("/tests", newTest, config);
+  return axios.post(`${baseURL}/tests`, newTest, config);
 }
 
 async function updateViews(token: string, testId: number) {
@@ -130,7 +130,7 @@ async function updateViews(token: string, testId: number) {
     id: testId,
   };
   const config = getConfig(token);
-  return baseAPI.patch("/tests", identifier, config);
+  return axios.patch(`${baseURL}/tests, identifier, config);
 }
 
 const api = {
